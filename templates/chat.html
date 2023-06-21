@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Chatbot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css'%}">
+
+</head>
+<style>
+    .text-danger {
+  color: #dc3545 !important;
+}
+
+a.text-danger:hover, a.text-danger:focus {
+  color: #a71d2a !important;
+}
+a.text-light:hover, a.text-light:focus {
+  color: #cbd3da !important;
+}
+
+.text-dark {
+  color: #343a40 !important;
+}
+
+a.text-dark:hover, a.text-dark:focus {
+  color: #fbff00 !important;
+}
+.ti-heart:before {
+    content: "\e634";
+}
+.ti-heart-broken:before {
+    content: "\e635";
+}
+a {
+    color: #fbff00;
+    text-decoration: none;
+    background-color: transparent;
+}
+
+</style>
+<body>
+    <div class="container-fluid h-100">
+        <div class="row justify-content-center h-100">
+            <div class="col-md-9 col-xl-9 chat">
+                <!-- <div class="card"> -->
+                <div class="card-header msg_head">
+                    <div class="d-flex message-dynamic">
+                        <div class="img_cont">
+                            <img src="{% static 'images\1.png'%}" class="rounded-circle user_img">
+                            <span class="online_icon"></span>
+                        </div>
+                        <div class="user_info">
+                            <span>
+                                <p>ChatBot</p>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div id="chatlog"></div>
+                <div class="card-body msg_card_body">
+                    <form>
+                        <div class="send_btn" id="send-btn">
+                            {% csrf_token %}
+                            <input type="text" id="message" class="form-control type_msg"
+                                placeholder="Type here...">
+                            <input type="submit" class="button" value="Send">
+                        </div>
+                        {% csrf_token %}
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $('form').on('submit', function (event) {
+                event.preventDefault();
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url "chat" %}',
+                    data: {
+                        message: $('#message').val(),
+                        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                    },
+                    success: function (data) {
+                        $('#chatlog').append('<div class="humanchat"><img src="{% static 'assets\img\user.png' %}" class="rounded-circle user_img_msg"/> <p >  <strong>User : </strong> ' + $('#message').val() + '</p></div>')
+
+                        $('#chatlog').append('<div class="botchat"><img src="{% static 'images\1.png'%}" class="rounded-circle user_img_msg"/> <p>  <strong>Bot : </strong> ' + data.bot_response + '</p></div>');
+
+                        $('#message').val('');
+
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
